@@ -28,10 +28,15 @@ function renderCourse(courses) {
     const listcourses = document.getElementById("list_courses");
     let htmls = courses.map(function (course) {
         return `
-            <li>
-                <h4>${course.title}</h4>
-                <p>${course.description}</p>
-                <button onclick="deleteCourse(${course.id})">delete</button>
+            <li class="course_data_${course.id}">
+                <div class="describe">
+                    <h4>Title: ${course.title}</h4>
+                    <p>Description: ${course.description}</p>
+                </div>
+                <div class="edit">
+                    <button onclick="showUpdateCourse(${course.id})">update</button>
+                    <button onclick="deleteCourse(${course.id})">delete</button>
+                </div>
             </li>
         `
     })
@@ -39,7 +44,7 @@ function renderCourse(courses) {
     listcourses.innerHTML = htmls.join('');
 }
 
-function handleCreateCourse() {
+function handleCreateCourse(id) {
     let createBtn = document.querySelector('#create');
     console.log(createBtn);
     createBtn.onclick = function () {
@@ -67,7 +72,56 @@ function createCourse(data, callback) {
         .then(function (response) {
             return response.json();
         })
-        .then(callback)
+        .then(function() {
+            getCourse(function(courses) {
+                renderCourse(courses);
+            });
+        })
+}
+
+function showUpdateCourse(id) {
+    const updateCourseID = document.querySelector('.update_course');
+    updateCourseID.style.display = "block";
+    const hideUpdateCourseID = document.querySelector('#hide');
+    hideUpdateCourseID.onclick = function() {
+        updateCourseID.style.display = "none";
+    }
+    handleUpdateCourse(id);
+}
+
+function handleUpdateCourse(id) {
+    let updateBtn = document.querySelector('#update');
+    console.log(updateBtn);
+    updateBtn.onclick = function () {
+        let name = document.querySelector('input[name="title_update"]').value;
+        let description = document.querySelector('input[name="description_update"]').value;
+
+        let formdata = {
+            title : name,
+            description : description
+        }
+        updateCourse(id, formdata);
+    }
+}
+
+function updateCourse(id, data) {
+    const options = {
+        method: "PUT", // *GET, POST, PUT, DELETE, etc.
+        headers: {
+          "Content-Type": "application/json",
+        //   'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify(data)
+    }
+    fetch(coursesapi + '/' + id, options)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function () {
+            getCourse(function(courses) {
+                renderCourse(courses);
+            });
+        })
 }
 
 function deleteCourse(id) {
@@ -82,5 +136,8 @@ function deleteCourse(id) {
         .then(function (response) {
             return response.json();
         })
-        .then(callback)
+        .then(function () {
+            let deleteCourse = document.querySelector('.course_data_'+id);
+            deleteCourse.remove();
+        })
 }
