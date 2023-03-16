@@ -1,0 +1,21 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    line-height: 1.4;
+}
+
+#list_courses {
+    padding: 20px 50px;
+}
+
+#list_courses li {
+    padding: 10px 20px;
+    border: 1px solid #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
